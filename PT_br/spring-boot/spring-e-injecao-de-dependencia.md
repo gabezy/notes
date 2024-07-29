@@ -6,7 +6,7 @@ Jakarta é o novo nome do Java EE quando o Eclipse Foundation ficou responsável
 
 ## Spring VS Spring Boot
 
-Spring é um <strong>framework modularizado e flexível</strong>, onde é possível criar aplicações como APIs, Web Services e etc. Ele é composto por diversos módulos que compõem o framework, <strong>não sendo obrigatório utilizar todos</strong>, como exempĺos abaixo, porém é necessário realizar as configurações prévias para utilizar suas funcionalidades:
+Spring é um <strong>framework modularizado e flexível</strong>, onde é possível criar aplicações como APIs, Web Services e etc. Ele é composto por diversos módulos que compõem o framework, <strong>não sendo obrigatório utilizar todos</strong>, como exemplos abaixo, porém é necessário realizar as configurações prévias para utilizar suas funcionalidades:
 
 - <strong>Spring Security</strong> para implementar segurança.
 - <strong>Spring Data</strong> para persistência de dados.
@@ -14,7 +14,7 @@ Spring é um <strong>framework modularizado e flexível</strong>, onde é possí
 - [Entre outros](https://spring.io/projects/spring-framework)
 
 
-Já o Spring Boot é uma ferramenta do Spring que já configuração esse módulos para serem utilizado, sendo feito a configuração e convenções definidas pela própria desenvolvedora da ferramenta, não gerando código. O Spring Boot utiliza os Starters para agrupar as dependências necessária para utilizar os módulos pré-configurado, como exemplo o spring-boot-starter-web que utiliza o Spring MVC e configura para criar Web Services.:
+Já o Spring Boot é uma ferramenta do Spring que já confugra esses módulos para serem utilizados, sendo feita a configuração e convenções definidas pela própria desenvolvedora da ferramenta, não gerando código. O Spring Boot utiliza os Starters para agrupar as dependências necessárias para utilizar os módulos pré-configurados, como exemplo o spring-boot-starter-web que utiliza o Spring MVC e configura para criar Web Services.
 
 
 Use o [Spring Initializr]() para  
@@ -110,10 +110,7 @@ As vantagens de utilizar IoC e injeção de dependências são:
 
 ## Spring IoC Container 
 
-É a implementação de injeção de dependêncais, também conhecido como <strong>Spring/application Context</strong>.
-Ao iniciar uma aplicação Spring, o container é inicializado e começa a instanciar os Beans da aplicação
-que ele deve gerenciar. Bean é o nome dado para objetos gerenciados, instanciado e configurado pelo container do Spring,
-podendo também ser injentado em outros Beans (dependências)
+É a implementação de injeção de dependênciass, também conhecido como <strong>Spring/application Context</strong>. Ao iniciar uma aplicação Spring, o container é inicializado e começa a instanciar os Beans da aplicação que ele deve gerenciar. Bean é o nome dado para objetos gerenciados, instanciados e configurados pelo container do Spring, podendo também ser injentado em outros Beans (dependências).
 
 ## Definindo beans com @Component
 
@@ -121,8 +118,7 @@ podendo também ser injentado em outros Beans (dependências)
 
 ## Injeção de dependência
 
-A injeção de dependência é utilziada no Spring principalmente através do construtor (melhor para teste) e do atributo
-utilizando o @Autowired, porém é possíve utilizar via Setter.
+A injeção de dependência é utilizada no Spring principalmente através do construtor (melhor para teste) e do atributo utilizando o @Autowired, porém é possíve utilizar via Setter.
 
 ```java
 // pelo construtor
@@ -154,8 +150,8 @@ public class Driver {
 
 ### Ambiguidade de Beans e lista de Beans
 
-A ambiguidade de beans pode ocorrer quando mais de um @Component implementa uma interface ou estende uma classe abstrada
-e essa é utilizada como dependência em outra classe, assim por padrão, o Spring não sabe definir qual dependência usar.
+A ambiguidade de beans pode ocorrer quando mais de um @Component implementa uma interface ou estende uma classe abstrata
+e essa é utilizada como dependência em outra classe, assim, por padrão, o Spring não sabe definir qual dependência usar.
 
 ```java
 public interface Notificador {
@@ -185,17 +181,15 @@ public class ServiceExamplo {
     private Notificador notificador; // irar apresentar erro de ambiguidade
 }
 ```
-Para solucinar esse erro, é possível implementar a seguintes soluções:
+
+Para solucionar esse erro, é possível implementar as seguintes soluções:
 - Passar uma lista da interface/classe abstrata para variável (List<Notificador>).
-- Usar o @Primary no bean desejado para prioriza-ló quando houver mais de um bean
+- Usar o @Primary no bean desejado para priorizar quando houver mais de um bean
 - Usar o @Qualifier("") no bean e na classe que utiliza o bean
 - Usar uma anotação customizada utilizando o @Qualifier e @Retetion(ReterionPolicy.RUNTIME)
 
 ## Spring Profiles
-Através do Spring profiles é possível alterar o comportamento e separqar componentes da aplicação que serão disponibilizados
-em determinados ambientes. Em suma, através desse parâmetro, que é passado na inicialização da aplicação, é possível alterar o comportamento
-dependendo do ambiente que é passado (Ex.: Local, hml, test, prod). É possível, por exemplo, mudar o banco de dados que cada ambiente
-utilizado.
+Através do Spring profiles é possível alterar o comportamento e separar componentes da aplicação que serão disponibilizados em determinados ambientes. Em suma, através desse parâmetro, que é passado na inicialização da aplicação, é possível alterar o comportamento dependendo do ambiente que é passado (Ex.: Local, hml, test, prod). É possível, por exemplo, mudar o banco de dados que cada ambiente utilizado.
 
 ```java
 @Profile("prod") // Roda apenas no ambiente de produção
@@ -221,3 +215,51 @@ public class NotificadorEmailMock implements Notificador {
 Para utilizar o perfil desejado é necessário colocar spring.profiles.active={"profile"} no
 application.properties ou passando por parâmetro quando executar a aplicação
 
+
+### Event Listener
+
+O Spring também implementa o Observer design pattern através da classe `ApplicationEventPublisher` que por meio do método `publishEvent` publica um evento na aplivcação e as classe(s) de serviço(s) ficam observando, por meio da anotação `@EventListener` nos métodas da classe, os eventos e conforme o evento que for publicado, a aplicação lida de maneiras diferentes.
+
+### Acessando propriedades por meio o @Value
+
+```yaml
+# application.yaml
+notificador:
+    email:
+        host-servidor: smtp.example.com.br
+        server-port: 25
+```
+
+Com as variáveis definidas no arquivo `properties/yaml`, é possível utilizá-las no código através da anotação `@Value`, que é usada no próprio atributo 
+
+```java
+public class EmailNotifier {
+
+    @Value("${noticador.email.host-servidor}") // utilizando o valor da propriedade definada 
+    private String host;
+
+    @Value("${noticador.email.server-port}")
+    private Integer port;
+
+    public void notify(Client client, String message) {
+        System.out.println("host " + host);
+        System.out.println("port " + port);
+    }
+
+}
+```
+
+Ou utilizar a anotação `@ConfigurationProperties("notificador.email")` para declarar qual prefixo utilizado quando for atribuir os valores aos atributos da classe.
+
+Obs.: Caso alguma variável no arquivo de propriedades tenha <strong>-</strong> no nome, na classe o nome do atributo dever omitir o <strong>-</strong> e a 1° letra da próxima palavra em maiúsculo.
+
+```java
+@Component
+@COnfigurationProperties("notificador.email")
+public class NotifierProperties {
+
+    private String hostServidor; // automáticamente as propriedades serão atribuidos para as variáveis
+    private Integer serverHost;
+
+}
+```
